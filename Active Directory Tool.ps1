@@ -1,6 +1,5 @@
 ﻿# Last Major Addition 3/20/23 - DS
-$LocalVersion = "0.9"
-cls
+Clear-Host
 
 Import-Module ActiveDirectory | Out-Null
 
@@ -81,7 +80,8 @@ $frmInitialScreen.Text = 'Active Directory Tool'
 $frmInitialScreen.Width = 640
 $frmInitialScreen.Height = 710
 $frmInitialScreen.Location = New-Object System.Drawing.Size(200,300)
-$frmInitialScreen.StartPosition = "manual"
+$frmInitialScreen.StartPosition = "CenterScreen"
+$frmInitialScreen.TopMost = $true
 $frmInitialScreen.MaximumSize = New-Object system.drawing.size(640, 900)
 $frmInitialScreen.MinimumSize = New-Object system.drawing.size(640, 710)
 
@@ -318,6 +318,16 @@ $btnCopyUsersOver.TabIndex = 11
 $frmInitialScreen.controls.Add($btnUnlockAccount)
 
 
+$btnExit = New-Object system.windows.Forms.Button
+$btnExit.Text = 'Exit'
+$btnExit.Width = 150
+$btnExit.Height = 40
+$btnExit.location = New-Object system.drawing.size(470,610)
+$btnExit.Font = "Microsoft Sans Serif,10"
+$btnExit.TabIndex = 14
+$btnExit.Anchor = "Bottom, Right"
+$frmInitialScreen.controls.Add($btnExit)
+
 #List boxes below
 
 $lstShowFirstGroups = New-Object system.windows.Forms.ListBox
@@ -364,8 +374,11 @@ $frmInitialScreen.controls.Add($lstVerboseOutput)
 
 $ErrorActionPreference = 'continue'
 $CurrentUser = [Environment]::UserName
-$CurrentMachine = [Environment]::MachineName
-$CurrentTime = Get-Date -Format g
+
+# =========================================================
+# Not In Use Yet ==========================================
+# $CurrentMachine = [Environment]::MachineName
+# $CurrentTime = Get-Date -Format g
 
 $RootCheck = Test-Path $RootPath
 $AppCheck = Test-Path $AppPath
@@ -458,7 +471,7 @@ $btnShowFirstGroups.Add_Click({
         }
         Try{
             $GroupnameSearch = $txtGetFirstGroupInfo.Text
-            $GroupList = Get-ADGroup -Filter "name -like '*$GroupnameSearch*'" | select SamAccountName
+            $GroupList = Get-ADGroup -Filter "name -like '*$GroupnameSearch*'" | Select-Object SamAccountName
 
             ForEach($Group in $GroupList){
         
@@ -509,7 +522,7 @@ $btnShowSecondGroups.Add_Click({
         Try{
 
             $GroupnameSearch2 = $txtGetSecondGroupInfo.Text
-            $GroupList2 = Get-ADGroup -Filter "name -like '*$GroupnameSearch2*'" | select SamAccountName
+            $GroupList2 = Get-ADGroup -Filter "name -like '*$GroupnameSearch2*'" | Select-Object SamAccountName
 
             ForEach($Group2 in $GroupList2){
         
@@ -621,7 +634,9 @@ $btnGetLockoutBlame.Add_Click({
         $DomainController = Get-ADDomainController -Discover -Service PrimaryDC
         $ComputerName = $DomainController.HostName
 
-        $DC = $ComputerName.ToString()
+        # ======================================
+        # Not in Use Yet =======================
+        #$DC = $ComputerName.ToString()
 
         Try{
             if($lstShowFirstGroups.SelectedItem -eq $null){
@@ -810,8 +825,11 @@ $btnShowFirstUsers.Add_click({
             ForEach ($UserProfile in $UserProfiles){
  
                 $Username = $UserProfile.name
-                $ObjectClass = $UserProfile.objectclass
-                $DisplayName = $UserProfile.displayname
+                
+                #=============================================
+                # Not in Use yet =============================
+                # $ObjectClass = $UserProfile.objectclass
+                # $DisplayName = $UserProfile.displayname
                 
                 foreach($User in $UserProfile){
 
@@ -835,7 +853,7 @@ $btnShowFirstUsers.Add_click({
         }Catch{
 
             ClearVerboseOutput
-            $VerboseMessage = ("Ensure you havn't highlighted a user already.")
+            $VerboseMessage = ("Ensure you haven't highlighted a user already.")
             $lstVerboseOutput.Items.Add($VerboseMessage)
         }
     }
@@ -969,6 +987,7 @@ $btnCopyUsersOver.Add_Click({
 # ===============================================================
 # Show members of group 
 # Note: Will thorw error if selecting a non-OU very error prone
+# TODO: Fix issue pulling user memberships
 # ===============================================================
 
 $btnShowMemberships.Add_Click({
@@ -996,8 +1015,8 @@ $btnShowMemberships.Add_Click({
         Try{
 
             $UserProfile = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object name, samaccountname
-            $UserProfileSAM = $UserProfile.samaccountname
-            $Memberships = Get-ADPrincipalGroupMembership -Identity $UserProfileSAM | select -ExpandProperty Name | Sort
+            $UserProfileSAM = $UserProfile.SamAccountName
+            $Memberships = Get-ADPrincipalGroupMembership -Identity $UserProfileSAM | Select-Object name | Sort-Object
 
             Foreach ($Group in $Memberships){
 
@@ -1009,7 +1028,7 @@ $btnShowMemberships.Add_Click({
         }Catch{
 
             ClearVerboseOutput
-            $VerboseMessage = ("Could not display memeberships. Ensure you have selected a user and not a group.")
+            $VerboseMessage = ("Could not display memberships. Ensure you have selected a user and not a group.")
             $lstVerboseOutput.Items.Add($VerboseMessage)
 
             $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
@@ -1112,33 +1131,26 @@ $btnShowHelp.Add_Click({
     ClearVerboseOutput
 
     $BlankLine = ("------")
-    $InfoNumber0 = ("Permissions within this app are based on your user account.")
-    $InfoNumber1 = ("Search for the source and destination groups using the search boxes.")
-    $InfoNumber2 = ("After highlighting a group from each box, select 'Copy All Users' to copy all the users from the left to the right group.")
-    $InfoNumber3 = ("You can also search for users by username or name which will be displayed in the first box.")
-    $InfoNumber4 = ("Highlight users from the first box and choose 'Copy Selected Users' to copy only these users to the destination group.")
-    $InfoNumber5 = ("Highlight a user and select 'Show Users Groups' to fill the second box with all the groups that the user belongs to.")
-    $InfoNumber6 = ("Highlight a user and select 'Lockout Location' to find the machine that locked out their account.")
-    $InfoNumber7 = ("Highlight a group in the source box and select 'Show Group Members' to display the users that are part of that group.")
-    $InfoNumber8 = ("Highlight a user and select 'Get User Info' to see their machine name, AD info, IP Address etc")
+
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber0)
+    $lstVerboseOutput.Items.Add("Permissions within this app are based on your user account.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber1)
+    $lstVerboseOutput.Items.Add("Search for the source and destination groups using the search boxes.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber2)
+    $lstVerboseOutput.Items.Add("After highlighting a group from each box, select 'Copy All Users' to copy all the users from the left to the right group.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber3)
+    $lstVerboseOutput.Items.Add("You can also search for users by username or name which will be displayed in the first box.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber4)
+    $lstVerboseOutput.Items.Add("Highlight users from the first box and choose 'Copy Selected Users' to copy only these users to the destination group.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber5)
+    $lstVerboseOutput.Items.Add("Highlight a user and select 'Show Users Groups' to fill the second box with all the groups that the user belongs to.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber6)
+    $lstVerboseOutput.Items.Add("Highlight a user and select 'Lockout Location' to find the machine that locked out their account.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber7)
+    $lstVerboseOutput.Items.Add("Highlight a group in the source box and select 'Show Group Members' to display the users that are part of that group.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add($InfoNumber8)
+    $lstVerboseOutput.Items.Add("Highlight a user and select 'Get User Info' to see their machine name, AD info, IP Address etc.")
+
 })
 
 # ========================================================
@@ -1258,6 +1270,22 @@ $btnCopySelectedUsers.Add_Click({
 })
 
 # ========================================================
+# Close Program Correctly
+# ========================================================
+
+$btnExit.Add_Click({
+
+    ("-~-") | Out-File $AppPath$LogFile -Append
+    BeginningTimestamp("Disconnected from Active Directory as < $CurrentUser > - Program Closed.")
+    
+    $frmInitialScreen.Add_FormClosing({
+        $_.Cancel=$false
+    })
+
+    $frmInitialScreen.Close()
+})
+
+# ========================================================
 # Text Cleaning Function
 # ========================================================
 
@@ -1283,12 +1311,16 @@ Function BeginningTimestamp([String] $functionLabel){
     ("") | Out-File $AppPath$LogFile -Append
     ("") | Out-File $AppPath$LogFile -Append
     ("$Timestamp - FUNCTION - $functionLabel") | Out-File $AppPath$LogFile -Append
-    ("/") | Out-File $AppPath$LogFile -Append
+    ("/ End of Session /") | Out-File $AppPath$LogFile -Append
 }
 
 # ========================================================
 # Code End
 # ========================================================
 
+# Disable use of the X/ Close button  
+$frmInitialScreen.add_FormClosing({
+    $_.Cancel = $true
+})
 #Launch form
-$frmInitialScreen.ShowDialog()
+[void] $frmInitialScreen.ShowDialog()
