@@ -3,6 +3,8 @@ Basic tool for interactions with the Active Directory
 
 This set of tools is for the day-to-day operation of the environment at the Red Cliff Tribal Office. 
 
+Server Scripts are added as needed to ensure that the operations are smooth and no longer need continuous monitoring.
+
 ### Prerequisites
 
 Having a current version of powershell is a bonus but not necessary.
@@ -18,7 +20,7 @@ This file is free for editing as you please.
 
 ## Versioning
 
-Current Version is 1.0. For all future releases please keep an eye [Here].
+Current Version is 1.00. For all future releases please keep an eye [Here].
 
 ## Authors
 
