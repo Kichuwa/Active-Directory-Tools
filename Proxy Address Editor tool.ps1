@@ -84,11 +84,12 @@ $frmInitialScreen = New-Object system.Windows.Forms.Form
 $frmInitialScreen.Text = 'Proxy Address Editor'
 $frmInitialScreen.Width = 750
 $frmInitialScreen.Height = 550
-$frmInitialScreen.Location = New-Object System.Drawing.Size(450,300)
+$frmInitialScreen.Location = New-Object System.Drawing.Size(450,295)
 $frmInitialScreen.StartPosition = "CenterScreen"
 $frmInitialScreen.TopMost = $true
-$frmInitialScreen.MaximumSize = New-Object system.drawing.size(650, 400)
-$frmInitialScreen.MinimumSize = New-Object system.drawing.size(550, 300)
+$frmInitialScreen.MaximumSize = New-Object system.drawing.size(650, 295)
+$frmInitialScreen.MinimumSize = New-Object system.drawing.size(650, 295)
+$frmInitialScreen.Opacity = 0.95
 
 # Search By user Input area.
 
@@ -97,7 +98,7 @@ $lblSearchItems.Text = 'Search:'
 $lblSearchItems.AutoSize = $true
 $lblSearchItems.Width = 25
 $lblSearchItems.Height = 10
-$lblSearchItems.location = New-Object system.drawing.size(5,20)
+$lblSearchItems.location = New-Object system.drawing.size(5,10)
 $lblSearchItems.Font = "Microsoft Sans Serif,10"
 $lblSearchItems.Anchor = "Left, Top"
 $frmInitialScreen.controls.Add($lblSearchItems)
@@ -105,7 +106,7 @@ $frmInitialScreen.controls.Add($lblSearchItems)
 $txtGetUsernameInfo = New-Object system.windows.Forms.TextBox
 $txtGetUsernameInfo.Width = 180
 $txtGetUsernameInfo.Height = 30
-$txtGetUsernameInfo.location = New-Object system.drawing.size(5,40)
+$txtGetUsernameInfo.location = New-Object system.drawing.size(5,30)
 $txtGetUsernameInfo.Font = "Microsoft Sans Serif,10"
 $txtGetUsernameInfo.TabIndex = 2
 $txtGetUsernameInfo.KeyUp
@@ -125,13 +126,91 @@ $btnSearchByUsername = New-Object system.windows.Forms.Button
 $btnSearchByUsername.Text = 'Search By Name'
 $btnSearchByUsername.Width = 180
 $btnSearchByUsername.Height = 30
-$btnSearchByUsername.location = New-Object system.drawing.size(5,65)
+$btnSearchByUsername.location = New-Object system.drawing.size(5,55)
 $btnSearchByUsername.Font = "Microsoft Sans Serif,10"
 $btnSearchByUsername.TabStop = $false
 $btnSearchByUsername.Anchor = "Left, Top"
 $frmInitialScreen.controls.Add($btnSearchByUsername)
 
+# Add and Delete Buttons
 
+$btnAddProxy = New-Object system.windows.Forms.Button
+$btnAddProxy.Text = 'Add Proxy Address'
+$btnAddProxy.Width = 180
+$btnAddProxy.Height = 45
+$btnAddProxy.location = New-Object system.drawing.size(5,105)
+$btnAddProxy.Font = "Microsoft Sans Serif,10"
+$btnAddProxy.TabStop = $false
+$btnAddProxy.Anchor = "Left, Top"
+$frmInitialScreen.controls.Add($btnAddProxy)
+
+$btnDeleteProxy = New-Object system.windows.Forms.Button
+$btnDeleteProxy.Text = 'Remove Proxy Address'
+$btnDeleteProxy.Width = 180
+$btnDeleteProxy.Height = 45
+$btnDeleteProxy.location = New-Object system.drawing.size(5,150)
+$btnDeleteProxy.Font = "Microsoft Sans Serif,10"
+$btnDeleteProxy.TabStop = $false
+$btnDeleteProxy.Anchor = "Left, Top"
+$frmInitialScreen.controls.Add($btnDeleteProxy)
+
+# Exit Button
+
+$btnExit = New-Object system.windows.Forms.Button
+$btnExit.Text = 'Exit'
+$btnExit.Width = 180
+$btnExit.Height = 30
+$btnExit.location = New-Object system.drawing.size(5,215)
+$btnExit.Font = "Microsoft Sans Serif,10"
+$btnExit.TabStop = $false
+$btnExit.Anchor = "Left, Top"
+$frmInitialScreen.controls.Add($btnExit)
+
+# User Listings
+
+$lblUsers = New-Object system.windows.Forms.Label
+$lblUsers.Text = 'Users:'
+$lblUsers.AutoSize = $true
+$lblUsers.Width = 25
+$lblUsers.Height = 10
+$lblUsers.location = New-Object system.drawing.size(195,10)
+$lblUsers.Font = "Microsoft Sans Serif,10"
+$lblUsers.Anchor = "Left, Top"
+$frmInitialScreen.controls.Add($lblUsers)
+
+$lstShowUser = New-Object system.windows.Forms.ListBox
+$lstShowUser.Text = "listView"
+$lstShowUser.Width = 200
+$lstShowUser.Height = 225
+$lstShowUser.location = New-Object system.drawing.point(195,30)
+$lstShowUser.TabIndex = 4
+$lstShowUser.SelectionMode = "One"
+$lstShowUser.Anchor = "Left, Right, Top"
+$frmInitialScreen.controls.Add($lstShowUser)
+
+
+# Show Proxies
+$lblProxies = New-Object system.windows.Forms.Label
+$lblProxies.Text = 'Proxies:'
+$lblProxies.AutoSize = $true
+$lblProxies.Width = 25
+$lblProxies.Height = 10
+$lblProxies.location = New-Object system.drawing.size(410,10)
+$lblProxies.Font = "Microsoft Sans Serif,10"
+$lblProxies.Anchor = "Left, Top"
+$frmInitialScreen.controls.Add($lblProxies)
+
+$lstShowProxy = New-Object system.windows.Forms.ListBox
+$lstShowProxy.Text = "listView"
+$lstShowProxy.Width = 200
+$lstShowProxy.Height = 225
+$lstShowProxy.location = New-Object system.drawing.point(410,30)
+$lstShowProxy.TabIndex = 4
+$lstShowProxy.SelectionMode = "One"
+$lstShowProxy.Anchor = "Left, Right, Top"
+$frmInitialScreen.controls.Add($lstShowProxy)
+
+# ================================
 
 
 
