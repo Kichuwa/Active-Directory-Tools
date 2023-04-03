@@ -319,13 +319,16 @@ $btnSearchByUsername.Add_Click({
             }
         }Catch{
 
-            Alert "Error" "Couldn't Connect to Active Directory"
+            Alert "Error" "Nothing to show."
             $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
-            ("$Timestamp - Couldn't Connect to Active Directory.")| Out-File $AppPath$LogFile -Append
+            ("$Timestamp - Nothing to show.")| Out-File $AppPath$LogFile -Append
         }
         ("-~-") | Out-File $AppPath$LogFile -Append
     }
 })
+
+# Update Prox List on User Highlight
+$User = $lstShowUser.SelectedItem
 
 
 # ================================
