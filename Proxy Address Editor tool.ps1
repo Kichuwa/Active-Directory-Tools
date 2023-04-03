@@ -210,9 +210,182 @@ $lstShowProxy.SelectionMode = "One"
 $lstShowProxy.Anchor = "Left, Right, Top"
 $frmInitialScreen.controls.Add($lstShowProxy)
 
+
+# End of Current GUI Stage =======================================
+
+#Connection test
+
+#Initial test to check if the user has access to AD by trying to search the name of the current user.
+
+$ErrorActionPreference = 'continue'
+$CurrentUser = [Environment]::UserName
+
+$RootCheck = Test-Path $RootPath
+$AppCheck = Test-Path $AppPath
+
+if($RootCheck -eq $true){
+    if($AppCheck -eq $true){
+
+        ("") | Out-File $AppPath$LogFile -Append
+        ("=====================") | Out-File $AppPath$LogFile -Append
+        ("Launched Proxy Editor at $Date") | Out-File $AppPath$LogFile -Append
+        ("=====================") | Out-File $AppPath$LogFile -Append
+    }
+    else{
+
+        mkdir $AppPath
+        ("") | Out-File $AppPath$LogFile -Append
+        ("=====================") | Out-File $AppPath$LogFile -Append
+        ("Launched Proxy Editor at $Date") | Out-File $AppPath$LogFile -Append
+        ("=====================") | Out-File $AppPath$LogFile -Append
+    }
+}
+else{
+
+    mkdir $RootPath
+    mkdir $AppPath
+    ("") | Out-File $AppPath$LogFile -Append
+    ("=====================") | Out-File $AppPath$LogFile -Append
+    ("Launched Proxy Editor at $Date") | Out-File $AppPath$LogFile -Append
+    ("=====================") | Out-File $AppPath$LogFile -Append
+}
+
+Try{
+
+    Get-ADUser -Filter "Name -like '*$CurrentUser*'" | Select-Object name, samaccountname
+    $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+    ("$Timestamp - Connected to Active Directory as < $CurrentUser >")| Out-File $AppPath$LogFile -Append
+    ("-~-") | Out-File $AppPath$LogFile -Append
+
+}Catch{
+
+    $BlankLine = ("------")
+    $ConnectionFailed = ("Unable to connect to Active Directory.")
+    $ConnectionFailed2 = ("Please ensure you have AD Services installed including the Powershell Module.")
+
+    $lstVerboseOutput.Items.Add($BlankLine)
+    $lstVerboseOutput.Items.Add($ConnectionFailed)
+    $lstVerboseOutput.Items.Add($BlankLine)
+    $lstVerboseOutput.Items.Add($ConnectionFailed2)
+    $lstVerboseOutput.Items.Add($BlankLine)
+
+    $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+    ("$Timestamp - $ConnectionFailed")| Out-File $AppPath$LogFile -Append
+    ("$Timestamp - $ConnectionFailed2")| Out-File $AppPath$LogFile -Append
+    ("-~-") | Out-File $AppPath$LogFile -Append
+}
+
+
+
+
+# ================================
+
+# Button for search
+$btnSearchByUsername.Add_Click({
+
+    BeginningTimestamp("Search by Username.")
+
+    $lstShowUser.SelectionMode = "MultiExtended"
+    if($txtGetUsernameInfo.Text -eq ""){
+        
+        Alert "No Query" "You must enter a user to search for."
+    }
+    else{
+        Try{
+            foreach($Item in $lstShowUser){
+
+            $lstShowUser.Items.Clear()
+            }
+        }
+        Catch{
+            continue
+        }
+        Try{
+            $UsernameSearch = $txtGetUsernameInfo.Text
+            $UsernameSearch = $UsernameSearch -replace ".{1}$"
+            $UserProfiles = Get-ADUser -Filter "Name -like '*$UsernameSearch*'" | Select-Object name, samaccountname
+            
+            foreach($User in $UserProfiles){
+
+                $Username = $User.name
+                if($Username -notmatch "tmp"){
+                    if($Username -notmatch "tmpl"){
+
+                        $lstShowUser.Items.Add($Username)
+                        $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+                        ("$Timestamp - User  search for < $UsernameSearch > returned - $Username.")| Out-File $AppPath$LogFile -Append
+                    }
+                }
+            }
+        }Catch{
+
+            Alert "Error" "Couldn't Connect to Active Directory"
+            $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+            ("$Timestamp - Couldn't Connect to Active Directory.")| Out-File $AppPath$LogFile -Append
+        }
+        ("-~-") | Out-File $AppPath$LogFile -Append
+    }
+})
+
+
 # ================================
 
 
+# Exit Button Function
+$btnExit.Add_Click({
 
-# ================================
+    ("-~-") | Out-File $AppPath$LogFile -Append
+    BeginningTimestamp("Disconnected from Active Directory as < $CurrentUser > - Program Closed.")
+    
+    $frmInitialScreen.Add_FormClosing({
+        $_.Cancel=$false
+    })
+
+    $frmInitialScreen.Close()
+})
+
+#Timestamp Function
+Function BeginningTimestamp([String] $functionLabel){
+
+    $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+    ("") | Out-File $AppPath$LogFile -Append
+    ("") | Out-File $AppPath$LogFile -Append
+    ("$Timestamp - FUNCTION - $functionLabel") | Out-File $AppPath$LogFile -Append
+    ("/ End of Session /") | Out-File $AppPath$LogFile -Append
+}
+
+
+# Alert Box for Users
+# Overloaded Method to Ensure this cannot be pushed behind initial application and ignored
+function Show-MessageBox {
+    [CmdletBinding()]
+    param(
+        [parameter(Mandatory = $true, Position = 0)]
+        [string]$Message,
+
+        [parameter(Mandatory = $false)]
+        [string]$Title = 'MessageBox in PowerShell',
+
+        [ValidateSet("OKOnly", "OKCancel", "AbortRetryIgnore", "YesNoCancel", "YesNo", "RetryCancel")]
+        [string]$Buttons = "OKCancel",
+
+        [ValidateSet("Critical", "Question", "Exclamation", "Information")]
+        [string]$Icon = "Information"
+    )
+    Add-Type -AssemblyName Microsoft.VisualBasic
+
+    [Microsoft.VisualBasic.Interaction]::MsgBox($Message, "$Buttons,SystemModal,$Icon", $Title)
+}
+
+# Shortened Call function for the alert
+# Note: This works as a POWERSHELL Method, not DOTNET therefore do not use parenthesis when using the function
+function Alert([String] $Title, [String] $Message){
+    Show-MessageBox -Title "$Title" -Message "$Message" -Icon Information -Buttons OKOnly
+}
+
+
+# Show Screen and Ensure the X button cannot be used.
+$frmInitialScreen.add_FormClosing({
+    $_.Cancel = $true
+})
 [void] $frmInitialScreen.ShowDialog()
