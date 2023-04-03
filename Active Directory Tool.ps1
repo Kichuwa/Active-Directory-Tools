@@ -1014,7 +1014,7 @@ $btnShowMemberships.Add_Click({
         }
         Try{
 
-            $UserProfile = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object name, samaccountname
+            $UserProfile = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object name, samaccountname, userprincipalname
             $UserProfileSAM = $UserProfile.SamAccountName
             $Memberships = Get-ADPrincipalGroupMembership -Identity $UserProfileSAM | Select-Object name | Sort-Object
 
@@ -1026,8 +1026,8 @@ $btnShowMemberships.Add_Click({
 
             }
         }Catch{
-
-            ClearVerboseOutput
+            # TODO: ClearVerboseOutput causes errors while fetching memberships due to output of group being put in second group list. 
+            # ClearVerboseOutput
             $VerboseMessage = ("Could not display memberships. Ensure you have selected a user and not a group.")
             $lstVerboseOutput.Items.Add($VerboseMessage)
 
