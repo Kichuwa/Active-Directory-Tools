@@ -572,7 +572,7 @@ $btnSearchByUsername.Add_Click({
         # Eventually implement a better regex for search results
         Try{
             $UsernameSearch = $txtGetUsernameInfo.Text
-            $UsernameSearch = $UsernameSearch -replace ".{1}$"
+            $UsernameSearch = $UsernameSearch -replace ".{0}$"
             $UserProfiles = Get-ADUser -Filter "Name -like '*$UsernameSearch*'" | Select-Object name, samaccountname
             
             foreach($User in $UserProfiles){
