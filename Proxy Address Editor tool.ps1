@@ -1,10 +1,4 @@
-# Baseline tool to work with
- 
-Get-ADUser -Identity Arons -Properties proxyaddresses | Select-Object Name, @{L = "ProxyAddresses"; E = { ($_.ProxyAddresses -like 'smtp:*') -join ";"}}
-
-# ============================================================================
-
-# Last Major Addition 4/3/23 - DS
+# Last Major Addition 4/4/23 - DS
 
 Clear-Host
 
@@ -70,7 +64,7 @@ $Date = [DateTime]::Now.ToString($dateFormat)
 $TimestampFormat = "HH:mm:ss"
 $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
 
-$LogDateFormat = "dd-MM-yyyy"
+$LogDateFormat = "MM-dd-yyyy"
 $LogDate = [DateTime]::Today.ToString($LogDateFormat)
 
 $RootPath = "C:\Temp\"
@@ -82,13 +76,13 @@ $LogFile = "log-$LogDate.txt"
 
 $frmInitialScreen = New-Object system.Windows.Forms.Form
 $frmInitialScreen.Text = 'Proxy Address Editor'
-$frmInitialScreen.Width = 750
+$frmInitialScreen.Width = 850
 $frmInitialScreen.Height = 550
-$frmInitialScreen.Location = New-Object System.Drawing.Size(450,295)
+$frmInitialScreen.Location = New-Object System.Drawing.Size(550,295)
 $frmInitialScreen.StartPosition = "CenterScreen"
 $frmInitialScreen.TopMost = $true
-$frmInitialScreen.MaximumSize = New-Object system.drawing.size(650, 295)
-$frmInitialScreen.MinimumSize = New-Object system.drawing.size(650, 295)
+$frmInitialScreen.MaximumSize = New-Object system.drawing.size(950, 295)
+$frmInitialScreen.MinimumSize = New-Object system.drawing.size(750, 295)
 $frmInitialScreen.Opacity = 0.95
 
 # Search By user Input area.
@@ -185,24 +179,24 @@ $lstShowUser.Height = 225
 $lstShowUser.location = New-Object system.drawing.point(195,30)
 $lstShowUser.TabIndex = 4
 $lstShowUser.SelectionMode = "One"
-$lstShowUser.Anchor = "Left, Right, Top"
+$lstShowUser.Anchor = "Left, Top"
 $frmInitialScreen.controls.Add($lstShowUser)
 
 
 # Show Proxies
 $lblProxies = New-Object system.windows.Forms.Label
-$lblProxies.Text = 'Proxies:'
+$lblProxies.Text = 'Proxy Addresses:'
 $lblProxies.AutoSize = $true
 $lblProxies.Width = 25
 $lblProxies.Height = 10
 $lblProxies.location = New-Object system.drawing.size(410,10)
 $lblProxies.Font = "Microsoft Sans Serif,10"
-$lblProxies.Anchor = "Left, Top"
+$lblProxies.Anchor = "Left, Right, Top"
 $frmInitialScreen.controls.Add($lblProxies)
 
 $lstShowProxy = New-Object system.windows.Forms.ListBox
 $lstShowProxy.Text = "listView"
-$lstShowProxy.Width = 200
+$lstShowProxy.Width = 400
 $lstShowProxy.Height = 225
 $lstShowProxy.location = New-Object system.drawing.point(410,30)
 $lstShowProxy.TabIndex = 4
@@ -302,7 +296,7 @@ $btnSearchByUsername.Add_Click({
         }
         Try{
             $UsernameSearch = $txtGetUsernameInfo.Text
-            $UsernameSearch = $UsernameSearch -replace ".{1}$"
+            $UsernameSearch = $UsernameSearch -replace ".{0}$"
             $UserProfiles = Get-ADUser -Filter "Name -like '*$UsernameSearch*'" | Select-Object name, samaccountname
             
             foreach($User in $UserProfiles){
@@ -328,8 +322,32 @@ $btnSearchByUsername.Add_Click({
 })
 
 # Update Prox List on User Highlight
-$User = $lstShowUser.SelectedItem
 
+$lstShowUser.Add_SelectedIndexChanged({
+
+    $SelectedUser = $lstShowUser.SelectedItem
+
+    BeginningTimestamp("Selected user $SelectedUser")
+
+    $Proxies = Get-ADUser -Filter "Name -eq '$SelectedUser'" -Properties proxyaddresses | Select-Object -ExpandProperty proxyaddresses | Where-Object {$_ -like 'smtp:*'} 
+
+    # Clear List on new Selection
+    $lstShowProxy.Items.Clear()
+
+    if($Proxies.Count -eq 0){
+        $lstShowProxy.Items.Add("No Proxy Address found for $SelectedUser")
+        $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+        ("$Timestamp - No Proxy Address found for $SelectedUser")| Out-File $AppPath$LogFile -Append
+    }
+    else {
+        foreach($Proxy in $Proxies){
+            $lstShowProxy.Items.Add($Proxy)
+            $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+            ("$Timestamp - Proxy Search for < $SelectedUser > returned - $Proxy.")| Out-File $AppPath$LogFile -Append
+        }
+    }
+    ("-~-") | Out-File $AppPath$LogFile -Append
+})
 
 # ================================
 
@@ -337,7 +355,6 @@ $User = $lstShowUser.SelectedItem
 # Exit Button Function
 $btnExit.Add_Click({
 
-    ("-~-") | Out-File $AppPath$LogFile -Append
     BeginningTimestamp("Disconnected from Active Directory as < $CurrentUser > - Program Closed.")
     
     $frmInitialScreen.Add_FormClosing({
@@ -354,7 +371,6 @@ Function BeginningTimestamp([String] $functionLabel){
     ("") | Out-File $AppPath$LogFile -Append
     ("") | Out-File $AppPath$LogFile -Append
     ("$Timestamp - FUNCTION - $functionLabel") | Out-File $AppPath$LogFile -Append
-    ("/ End of Session /") | Out-File $AppPath$LogFile -Append
 }
 
 
