@@ -72,7 +72,7 @@ $AppPath = "C:\Temp\ProxyAddress-Tool\"
 $LogFile = "log-$LogDate.txt"
 
 
-
+# Initial Form
 
 $frmInitialScreen = New-Object system.Windows.Forms.Form
 $frmInitialScreen.Text = 'Proxy Address Editor'
@@ -184,6 +184,7 @@ $frmInitialScreen.controls.Add($lstShowUser)
 
 
 # Show Proxies
+
 $lblProxies = New-Object system.windows.Forms.Label
 $lblProxies.Text = 'Proxy Addresses:'
 $lblProxies.AutoSize = $true
@@ -271,10 +272,10 @@ Try{
 
 
 
-
+# Search Active Directory for users that match a string to some degree which then pulls the closest match
 # ================================
-
 # Button for search
+# ================================
 $btnSearchByUsername.Add_Click({
 
     BeginningTimestamp("Search by Username.")
@@ -285,34 +286,47 @@ $btnSearchByUsername.Add_Click({
         Alert "No Query" "You must enter a user to search for."
     }
     else{
+        # Clear Both Boxes on Search
         Try{
             foreach($Item in $lstShowUser){
-
-            $lstShowUser.Items.Clear()
+                $lstShowUser.Items.Clear()
+                $lstShowProxy.Items.Clear()
             }
         }
         Catch{
             continue
         }
+        # Attempt to see if users match a string of characters
         Try{
             $UsernameSearch = $txtGetUsernameInfo.Text
             $UsernameSearch = $UsernameSearch -replace ".{0}$"
             $UserProfiles = Get-ADUser -Filter "Name -like '*$UsernameSearch*'" | Select-Object name, samaccountname
             
-            foreach($User in $UserProfiles){
+            # If no Match disable ability to select from list
+            if($UserProfiles.Count -eq 0){
+                $lstShowUser.Enabled = $false
+                $lstShowUser.Items.Add("No Results for $UsernameSearch")
+                $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+                ("$Timestamp - User  search for < $UsernameSearch > returned no results.")| Out-File $AppPath$LogFile -Append
+            }
+            # If match allow Enum
+            else {
+                $lstShowUser.Enabled = $true
+                foreach($User in $UserProfiles){
 
-                $Username = $User.name
-                if($Username -notmatch "tmp"){
-                    if($Username -notmatch "tmpl"){
-
-                        $lstShowUser.Items.Add($Username)
-                        $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
-                        ("$Timestamp - User  search for < $UsernameSearch > returned - $Username.")| Out-File $AppPath$LogFile -Append
+                    $Username = $User.name
+                    if($Username -notmatch "tmp"){
+                        if($Username -notmatch "tmpl"){
+    
+                            $lstShowUser.Items.Add($Username)
+                            $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+                            ("$Timestamp - User  search for < $UsernameSearch > returned - $Username.")| Out-File $AppPath$LogFile -Append
+                        }
                     }
                 }
             }
         }Catch{
-
+            # Throw if extraneous error occurs. I.E. no AD connectivity.
             Alert "Error" "Nothing to show."
             $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
             ("$Timestamp - Nothing to show.")| Out-File $AppPath$LogFile -Append
@@ -321,7 +335,10 @@ $btnSearchByUsername.Add_Click({
     }
 })
 
+# When a user highlights a user in the results box from user search output is shown in second box
+# ====================================
 # Update Prox List on User Highlight
+# ====================================
 
 $lstShowUser.Add_SelectedIndexChanged({
 
@@ -329,17 +346,22 @@ $lstShowUser.Add_SelectedIndexChanged({
 
     BeginningTimestamp("Selected user $SelectedUser")
 
+    # Selects all proxy Adderesses that match a SMTP or smtp object.
     $Proxies = Get-ADUser -Filter "Name -eq '$SelectedUser'" -Properties proxyaddresses | Select-Object -ExpandProperty proxyaddresses | Where-Object {$_ -like 'smtp:*'} 
 
     # Clear List on new Selection
     $lstShowProxy.Items.Clear()
 
+    # Disable the Proxy output if no valid return
     if($Proxies.Count -eq 0){
+        $lstShowProxy.Enabled = $false
         $lstShowProxy.Items.Add("No Proxy Address found for $SelectedUser")
         $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
         ("$Timestamp - No Proxy Address found for $SelectedUser")| Out-File $AppPath$LogFile -Append
     }
+    # Enable and allow use of proxy listing is returns are valid
     else {
+        $lstShowProxy.Enabled = $true
         foreach($Proxy in $Proxies){
             $lstShowProxy.Items.Add($Proxy)
             $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
@@ -349,10 +371,33 @@ $lstShowUser.Add_SelectedIndexChanged({
     ("-~-") | Out-File $AppPath$LogFile -Append
 })
 
+# Creates a pop-up for the 
+# ================================
+# Add Proxy Button
 # ================================
 
+# TODO
+$btnAddProxy.Add_Click({
 
+})
+
+
+# Deletes the proxy from the selected users returned proxies.
+# ================================
+# Delete Proxy Button
+# ================================
+
+# TODO
+$btnDeleteProxy.Add_Click({
+    
+})
+
+
+
+# Enforces the use of the exit button such that any other method of closing will not work including forced close.
+# ================================
 # Exit Button Function
+# ================================
 $btnExit.Add_Click({
 
     BeginningTimestamp("Disconnected from Active Directory as < $CurrentUser > - Program Closed.")
@@ -364,7 +409,10 @@ $btnExit.Add_Click({
     $frmInitialScreen.Close()
 })
 
-#Timestamp Function
+# Basic Timestamp Function for the tracking of method using 
+# ================================
+# Timestamp Function
+# ================================
 Function BeginningTimestamp([String] $functionLabel){
 
     $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
@@ -376,6 +424,9 @@ Function BeginningTimestamp([String] $functionLabel){
 
 # Alert Box for Users
 # Overloaded Method to Ensure this cannot be pushed behind initial application and ignored
+# ================================
+# MessageBox Function
+# ================================
 function Show-MessageBox {
     [CmdletBinding()]
     param(
@@ -398,12 +449,17 @@ function Show-MessageBox {
 
 # Shortened Call function for the alert
 # Note: This works as a POWERSHELL Method, not DOTNET therefore do not use parenthesis when using the function
+# ================================
+# Alert Function
+# ================================
 function Alert([String] $Title, [String] $Message){
     Show-MessageBox -Title "$Title" -Message "$Message" -Icon Information -Buttons OKOnly
 }
 
 
+# ========================================================
 # Show Screen and Ensure the X button cannot be used.
+# ========================================================
 $frmInitialScreen.add_FormClosing({
     $_.Cancel = $true
 })
