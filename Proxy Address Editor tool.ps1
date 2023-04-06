@@ -84,6 +84,9 @@ $frmInitialScreen.TopMost = $true
 $frmInitialScreen.MaximumSize = New-Object system.drawing.size(950, 295)
 $frmInitialScreen.MinimumSize = New-Object system.drawing.size(750, 295)
 $frmInitialScreen.Opacity = 0.95
+$frmInitialScreen.MaximizeBox = $false
+$frmInitialScreen.Minimizebox = $false
+$frmInitialScreen.ControlBox = $false
 
 # Search By user Input area.
 
@@ -371,14 +374,75 @@ $lstShowUser.Add_SelectedIndexChanged({
     ("-~-") | Out-File $AppPath$LogFile -Append
 })
 
-# Creates a pop-up for the 
+# Creates a pop-up for the input and acceptance of data.
 # ================================
 # Add Proxy Button
 # ================================
 
 # TODO
 $btnAddProxy.Add_Click({
+    # Create a new Form
+    $frmAddProxy = New-Object system.Windows.Forms.Form
+    $frmAddProxy.Text = 'Add New Proxy'
+    $frmAddProxy.Width = 575
+    $frmAddProxy.Height = 135
+    $frmAddProxy.Location = New-Object System.Drawing.Size(575,135)
+    $frmAddProxy.StartPosition = "CenterScreen"
+    $frmAddProxy.TopMost = $true
+    $frmAddProxy.MaximumSize = New-Object system.drawing.size(575, 135)
+    $frmAddProxy.MinimumSize = New-Object system.drawing.size(575, 135)
 
+    # Text Box Label and Input
+    $lblProxyLabel = New-Object system.windows.Forms.Label
+    $lblProxyLabel.Text = 'Proxy Address to Add:'
+    $lblProxyLabel.AutoSize = $true
+    $lblProxyLabel.Width = 25
+    $lblProxyLabel.Height = 10
+    $lblProxyLabel.location = New-Object system.drawing.size(5,10)
+    $lblProxyLabel.Font = "Microsoft Sans Serif,10"
+    $lblProxyLabel.Anchor = "Left, Top"
+    $frmAddProxy.controls.Add($lblProxyLabel)
+
+    $txtProxyAddress = New-Object system.windows.Forms.TextBox
+    $txtProxyAddress.Width = 550
+    $txtProxyAddress.Height = 30
+    $txtProxyAddress.location = New-Object system.drawing.size(5,30)
+    $txtProxyAddress.Font = "Microsoft Sans Serif,10"
+    $txtProxyAddress.TabIndex = 2
+    $txtProxyAddress.KeyUp
+    $txtProxyAddress.Anchor = "Left, Top"
+    $frmAddProxy.controls.Add($txtProxyAddress)
+    
+    # Button For OK
+    $btnProxyAccept = New-Object system.windows.Forms.Button
+    $btnProxyAccept.Text = 'OK'
+    $btnProxyAccept.Width = 90
+    $btnProxyAccept.Height = 30
+    $btnProxyAccept.location = New-Object system.drawing.size(370,58)
+    $btnProxyAccept.Font = "Microsoft Sans Serif,10"
+    $btnProxyAccept.TabStop = $false
+    $btnProxyAccept.Anchor = "Right, Top"
+    $frmAddProxy.controls.Add($btnProxyAccept)
+
+    # Button For Decline
+    $btnProxyDecline = New-Object system.windows.Forms.Button
+    $btnProxyDecline.Text = 'Cancel'
+    $btnProxyDecline.Width = 90
+    $btnProxyDecline.Height = 30
+    $btnProxyDecline.location = New-Object system.drawing.size(465,58)
+    $btnProxyDecline.Font = "Microsoft Sans Serif,10"
+    $btnProxyDecline.TabStop = $false
+    $btnProxyDecline.Anchor = "Right, Top"
+    $frmAddProxy.controls.Add($btnProxyDecline)
+
+
+    
+
+    # Show Form
+    [void]$frmAddProxy.ShowDialog()
+
+    # Clear and Dispose of Form after accepting Data
+    $frmAddProxy.Close()
 })
 
 
