@@ -84,6 +84,9 @@ $frmInitialScreen.StartPosition = "CenterScreen"
 $frmInitialScreen.TopMost = $true
 $frmInitialScreen.MaximumSize = New-Object system.drawing.size(640, 900)
 $frmInitialScreen.MinimumSize = New-Object system.drawing.size(640, 710)
+$frmInitialScreen.MaximizeBox = $false
+$frmInitialScreen.Minimizebox = $false
+$frmInitialScreen.ControlBox = $false
 
 
 $lblSearchItems = New-Object system.windows.Forms.Label
