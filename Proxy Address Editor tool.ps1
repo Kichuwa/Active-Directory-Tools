@@ -391,6 +391,9 @@ $btnAddProxy.Add_Click({
     $frmAddProxy.TopMost = $true
     $frmAddProxy.MaximumSize = New-Object system.drawing.size(575, 135)
     $frmAddProxy.MinimumSize = New-Object system.drawing.size(575, 135)
+    $frmAddProxy.MaximizeBox = $false
+    $frmAddProxy.Minimizebox = $false
+    $frmAddProxy.ControlBox = $false
 
     # Text Box Label and Input
     $lblProxyLabel = New-Object system.windows.Forms.Label
@@ -435,14 +438,46 @@ $btnAddProxy.Add_Click({
     $btnProxyDecline.Anchor = "Right, Top"
     $frmAddProxy.controls.Add($btnProxyDecline)
 
+    # Functionality for the buttons
 
+    # Add Click
+    $btnProxyAccept.Add_Click({
+        $SelectedUser = $lstShowUser.SelectedItem
+        
+        $ProxyAddress = $txtProxyAddress.Text
+
+        # Verify that it's not Null and Valid
+        if (($ProxyAddress -eq $null) -or ($ProxyAddress -eq "")){
+            Alert "No Proxy Given" "Cannot add empty proxy address"
+        }
+        # Pop-up to assure the this is what the user wants
+        else{
+            # Logic for Acceptance or Otherwise cancellation
+
+            # For Acceptance: 
+            # Pass Data to AD/O365 and add the proxy address
+            # Close pop-up and clear text-box or 
+
+            # For Cancellation:
+            # Close Pop-up
+
+            # Close Subform
+            $frmAddProxy.Close()
+        }
+    })
+
+    # 
+    $btnProxyDecline.Add_Click({
     
+        # Clear and Dispose of Form after accepting Data
+        $frmAddProxy.Close()
+    })
 
     # Show Form
+    $frmInitialScreen.add_FormClosing({
+        $_.Cancel = $true
+    })
     [void]$frmAddProxy.ShowDialog()
-
-    # Clear and Dispose of Form after accepting Data
-    $frmAddProxy.Close()
 })
 
 
@@ -453,7 +488,11 @@ $btnAddProxy.Add_Click({
 
 # TODO
 $btnDeleteProxy.Add_Click({
-    
+    # Ensure that both user and desired proxy is highlighted
+    # if not throw notice
+
+    # Pop-up to alert {proxy} will be removed from {user}
+    # if yes complete action if no just close and do nothing
 })
 
 
