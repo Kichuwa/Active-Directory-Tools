@@ -290,7 +290,6 @@ $btnSearchByUsername.Add_Click({
         Alert "No Query" "You must enter a user to search for."
     }
     else{
-        # Clear Both Boxes on Search
         Try{
             foreach($Item in $lstShowUser){
                 $lstShowUser.Items.Clear()
@@ -300,20 +299,17 @@ $btnSearchByUsername.Add_Click({
         Catch{
             continue
         }
-        # Attempt to see if users match a string of characters
         Try{
             $UsernameSearch = $txtGetUsernameInfo.Text
             $UsernameSearch = $UsernameSearch -replace ".{0}$"
             $UserProfiles = Get-ADUser -Filter "Name -like '*$UsernameSearch*'" | Select-Object name, samaccountname
             
-            # If no Match disable ability to select from list
             if($UserProfiles.Count -eq 0){
                 $lstShowUser.Enabled = $false
                 $lstShowUser.Items.Add("No Results for $UsernameSearch")
                 $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
                 ("$Timestamp - User  search for < $UsernameSearch > returned no results.")| Out-File $AppPath$LogFile -Append
             }
-            # If match allow Enum
             else {
                 $lstShowUser.Enabled = $true
                 foreach($User in $UserProfiles){
@@ -349,26 +345,21 @@ $lstShowUser.Add_SelectedIndexChanged({
 
     $SelectedUser = $lstShowUser.SelectedItem
 
-    # Set buttons to active
     $btnAddProxy.Enabled = $true
     $btnDeleteProxy.Enabled = $true
 
     BeginningTimestamp("Selected user $SelectedUser")
 
-    # Selects all proxy Adderesses that match a SMTP or smtp object.
     $Proxies = Get-ADUser -Filter "Name -eq '$SelectedUser'" -Properties proxyaddresses | Select-Object -ExpandProperty proxyaddresses | Where-Object {$_ -like 'smtp:*'} 
 
-    # Clear List on new Selection
     $lstShowProxy.Items.Clear()
 
-    # Disable the Proxy output if no valid return
     if($Proxies.Count -eq 0){
         $lstShowProxy.Enabled = $false
         $lstShowProxy.Items.Add("No Proxy Address found for $SelectedUser")
         $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
         ("$Timestamp - No Proxy Address found for $SelectedUser")| Out-File $AppPath$LogFile -Append
     }
-    # Enable and allow use of proxy listing is returns are valid
     else {
         $lstShowProxy.Enabled = $true
         foreach($Proxy in $Proxies){
@@ -445,8 +436,11 @@ $btnAddProxy.Add_Click({
     $frmAddProxy.controls.Add($btnProxyDecline)
 
     # Functionality for the buttons
-
-    # Add Click
+    ##
+    # Confirm proxy addition
+    # ========================================================
+    # Add in Add Proxy Sub-Form
+    # ========================================================
     # Current version exclusively uses secondary addresses only as this is meant to only assign smtp addresses for reading mail, not writing.
     $btnProxyAccept.Add_Click({
 
@@ -458,17 +452,13 @@ $btnAddProxy.Add_Click({
 
         if (($SelectedUser -eq $null) -or ($SelectedUser -eq "")) {
             Alert "No User Selected" "Cannot add to empty user"
-            # Verify that it's not Null and Valid
         }
         elseif (($ProxyAddress -eq $null) -or ($ProxyAddress -eq "")){
             Alert "No Proxy Given" "Cannot add empty proxy address"
         }
         # Pop-up to assure the this is what the user wants
         else{
-                # Logic for Acceptance or Otherwise cancellation
                 $Selection = Confirmation "Add New Proxy Address" "You are about to add $ProxyAddress to $SelectedUser. Are you sure?"
-
-                # Verify confirmation.
                 if($Selection -eq "Yes"){
                     Set-ADUser $UserSAMAccount -Add @{ProxyAddresses="smtp:$ProxyAddress"}
                     $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
@@ -485,10 +475,13 @@ $btnAddProxy.Add_Click({
             }
         
     })
-
-    # Cancel Button in (Add)
+    
+    ##
+    # If user decides to cancel decision.
+    # ========================================================
+    # Cancel in Add Proxy Sub-Form
+    # ========================================================
     $btnProxyDecline.Add_Click({
-        # Clear and Dispose of Form after accepting Data
         $frmAddProxy.Close()
         $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
         ("$Timestamp - Addition to $SelectedUser cancelled")| Out-File $AppPath$LogFile -Append
@@ -514,21 +507,16 @@ $btnDeleteProxy.Add_Click({
     $SelectedUser = $lstShowUser.SelectedItem
     $UserSAMAccount = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object -ExpandProperty SamAccountName
     $ProxyToDelete = $lstShowProxy.SelectedItem
-
-    # Check if user is highlighted 
+ 
     if (($SelectedUser -eq $null) -or ($SelectedUser -eq "")){
         Alert "No User Selected" "Cannot perform action on empty user"
     }
     else {
-        # Check if proxy is highlighted
         if (($ProxyToDelete -eq $null) -or ($ProxyToDelete -eq "")){
             Alert "No Proxy Selected" "Cannot delete empty proxy address"
-        }
-        # Perform if both 
+        } 
         else {
-            # Logic for Acceptance or Otherwise cancellation
             $Selection = Confirmation "Remove Proxy Address" "You are about to remove $ProxyAddress from $SelectedUser. Are you sure?"
-
             if($Selection -eq "Yes"){
                 Set-ADUser $UserSAMAccount -remove @{ProxyAddresses="$ProxyToDelete"}
                 $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
