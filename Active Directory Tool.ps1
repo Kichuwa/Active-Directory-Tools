@@ -138,6 +138,8 @@ $lblFootnote.Font = "Microsoft Sans Serif,8"
 $lblFootnote.Anchor = "Left, Bottom"
 $frmInitialScreen.controls.Add($lblFootnote)
 
+# Search Text Box
+
 $txtGetFirstGroupInfo = New-Object system.windows.Forms.TextBox
 $txtGetFirstGroupInfo.Width = 178
 $txtGetFirstGroupInfo.Height = 20
@@ -145,62 +147,15 @@ $txtGetFirstGroupInfo.location = New-Object system.drawing.size(5,40)
 $txtGetFirstGroupInfo.Font = "Microsoft Sans Serif,10"
 $txtGetFirstGroupInfo.TabIndex = 0
 $frmInitialScreen.controls.Add($txtGetFirstGroupInfo)
-$txtGetFirstGroupInfo_KeyDown = {}
-$txtGetFirstGroupInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{}
-$txtGetFirstGroupInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{
-    if ($_.KeyCode -eq 'Enter')
-    {
-        $btnShowFirstGroups.PerformClick()
-    }
-}
 $txtGetFirstGroupInfo.Anchor = "Left, Top"
-$txtGetFirstGroupInfo.Add_KeyDown($txtGetFirstGroupInfo_KeyDown)
 
-
-$txtGetSecondGroupInfo = New-Object system.windows.Forms.TextBox
-$txtGetSecondGroupInfo.Width = 178
-$txtGetSecondGroupInfo.Height = 20
-$txtGetSecondGroupInfo.location = New-Object system.drawing.size(5,105)
-$txtGetSecondGroupInfo.Font = "Microsoft Sans Serif,10"
-$txtGetSecondGroupInfo.TabIndex = 1
-$frmInitialScreen.controls.Add($txtGetSecondGroupInfo)
-$txtGetSecondGroupInfo_KeyDown = {}
-$txtGetSecondGroupInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{}
-$txtGetSecondGroupInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{
-    if ($_.KeyCode -eq 'Enter')
-    {
-        $btnShowSecondGroups.PerformClick()
-    }
-}
-$txtGetSecondGroupInfo.Anchor = "Left, Top"
-$txtGetSecondGroupInfo.Add_KeyDown($txtGetSecondGroupInfo_KeyDown)
-
-$txtGetUsernameInfo = New-Object system.windows.Forms.TextBox
-$txtGetUsernameInfo.Width = 178
-$txtGetUsernameInfo.Height = 20
-$txtGetUsernameInfo.location = New-Object system.drawing.size(5,175)
-$txtGetUsernameInfo.Font = "Microsoft Sans Serif,10"
-$txtGetUsernameInfo.TabIndex = 2
-$txtGetUsernameInfo.KeyUp
-$frmInitialScreen.controls.Add($txtGetUsernameInfo)
-$txtGetUsernameInfo_KeyDown = {}
-$txtGetUsernameInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{}
-$txtGetUsernameInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{
-    if ($_.KeyCode -eq 'Enter')
-    {
-        $btnSearchByUsername.PerformClick()
-    }
-}
-$txtGetUsernameInfo.Anchor = "Left, Top"
-$txtGetUsernameInfo.Add_KeyDown($txtGetUsernameInfo_KeyDown)
-
-#Buttons below are vertical
+# Buttons below are vertical (Searches and Clear)
 
 $btnShowFirstGroups = New-Object system.windows.Forms.Button
 $btnShowFirstGroups.Text = 'Search Source Group'
 $btnShowFirstGroups.Width = 180
-$btnShowFirstGroups.Height = 30
-$btnShowFirstGroups.location = New-Object system.drawing.size(4,65)
+$btnShowFirstGroups.Height = 45
+$btnShowFirstGroups.location = New-Object system.drawing.size(4,70)
 $btnShowFirstGroups.Font = "Microsoft Sans Serif,10"
 $btnShowFirstGroups.TabStop = $false
 $btnShowFirstGroups.Anchor = "Left, Top"
@@ -209,8 +164,8 @@ $frmInitialScreen.controls.Add($btnShowFirstGroups)
 $btnShowSecondGroups = New-Object system.windows.Forms.Button
 $btnShowSecondGroups.Text = 'Search Destination Group'
 $btnShowSecondGroups.Width = 180
-$btnShowSecondGroups.Height = 30
-$btnShowSecondGroups.location = New-Object system.drawing.size(4,130)
+$btnShowSecondGroups.Height = 45
+$btnShowSecondGroups.location = New-Object system.drawing.size(4,120)
 $btnShowSecondGroups.Font = "Microsoft Sans Serif,10"
 $btnShowSecondGroups.TabStop = $false
 $btnShowSecondGroups.Anchor = "Left, Top"
@@ -219,8 +174,8 @@ $frmInitialScreen.controls.Add($btnShowSecondGroups)
 $btnSearchByUsername = New-Object system.windows.Forms.Button
 $btnSearchByUsername.Text = 'Search By Name'
 $btnSearchByUsername.Width = 180
-$btnSearchByUsername.Height = 30
-$btnSearchByUsername.location = New-Object system.drawing.size(4,200)
+$btnSearchByUsername.Height = 45
+$btnSearchByUsername.location = New-Object system.drawing.size(4,170)
 $btnSearchByUsername.Font = "Microsoft Sans Serif,10"
 $btnSearchByUsername.TabStop = $false
 $btnSearchByUsername.Anchor = "Left, Top"
@@ -229,8 +184,8 @@ $frmInitialScreen.controls.Add($btnSearchByUsername)
 $btnClearListBoxes = New-Object system.windows.Forms.Button
 $btnClearListBoxes.Text = 'Clear'
 $btnClearListBoxes.Width = 180
-$btnClearListBoxes.Height = 30
-$btnClearListBoxes.location = New-Object system.drawing.size(4,235)
+$btnClearListBoxes.Height = 45
+$btnClearListBoxes.location = New-Object system.drawing.size(4,220)
 $btnClearListBoxes.Font = "Microsoft Sans Serif,10"
 $btnClearListBoxes.TabIndex = 3
 $btnClearListBoxes.Anchor = "Left, Top"
@@ -378,11 +333,6 @@ $frmInitialScreen.controls.Add($lstVerboseOutput)
 $ErrorActionPreference = 'continue'
 $CurrentUser = [Environment]::UserName
 
-# =========================================================
-# Not In Use Yet ==========================================
-# $CurrentMachine = [Environment]::MachineName
-# $CurrentTime = Get-Date -Format g
-
 $RootCheck = Test-Path $RootPath
 $AppCheck = Test-Path $AppPath
 
@@ -506,7 +456,7 @@ $btnShowSecondGroups.Add_Click({
 
     BeginningTimestamp("Search Second Group.")
 
-    if($txtGetSecondGroupInfo.Text -eq ""){
+    if($txtGetFirstGroupInfo.Text -eq ""){
 
         ClearVerboseOutput
         $VerboseMessage = ("You can't leave the detination box blank.")
@@ -524,7 +474,7 @@ $btnShowSecondGroups.Add_Click({
         }
         Try{
 
-            $GroupnameSearch2 = $txtGetSecondGroupInfo.Text
+            $GroupnameSearch2 = $txtGetFirstGroupInfo.Text
             $GroupList2 = Get-ADGroup -Filter "name -like '*$GroupnameSearch2*'" | Select-Object SamAccountName
 
             ForEach($Group2 in $GroupList2){
@@ -556,7 +506,7 @@ $btnSearchByUsername.Add_Click({
     BeginningTimestamp("Search by Username.")
 
     $lstShowFirstGroups.SelectionMode = "MultiExtended"
-    if($txtGetUsernameInfo.Text -eq ""){
+    if($txtGetFirstGroupInfo.Text -eq ""){
 
         ClearVerboseOutput
         $VerboseMessage = ("You can't leave the username box blank.")
@@ -574,7 +524,7 @@ $btnSearchByUsername.Add_Click({
         }
         # Eventually implement a better regex for search results
         Try{
-            $UsernameSearch = $txtGetUsernameInfo.Text
+            $UsernameSearch = $txtGetFirstGroupInfo.Text
             $UsernameSearch = $UsernameSearch -replace ".{0}$"
             $UserProfiles = Get-ADUser -Filter "Name -like '*$UsernameSearch*'" | Select-Object name, samaccountname
             
@@ -616,8 +566,8 @@ $btnClearListBoxes.Add_Click({
     }
 
     $txtGetFirstGroupInfo.Text = ""
-    $txtGetSecondGroupInfo.Text = ""
-    $txtGetUsernameInfo.Text = ""
+    $txtGetFirstGroupInfo.Text = ""
+    $txtGetFirstGroupInfo.Text = ""
 })
 
 
@@ -989,8 +939,7 @@ $btnCopyUsersOver.Add_Click({
 
 # ===============================================================
 # Show members of group 
-# Note: Will thorw error if selecting a non-OU very error prone
-# TODO: Fix issue pulling user memberships
+# Note: Will throw error if selecting a non-OU very error prone
 # ===============================================================
 
 $btnShowMemberships.Add_Click({
@@ -1028,8 +977,7 @@ $btnShowMemberships.Add_Click({
                 ("$Timestamp - < $UserProfileSAM > belongs to - $Group.")| Out-File $AppPath$LogFile -Append
 
             }
-        }Catch{
-            # TODO: ClearVerboseOutput causes errors while fetching memberships due to output of group being put in second group list. 
+        }Catch{ 
             # ClearVerboseOutput
             $VerboseMessage = ("Could not display memberships. Ensure you have selected a user and not a group.")
             $lstVerboseOutput.Items.Add($VerboseMessage)
