@@ -379,7 +379,6 @@ $lstShowUser.Add_SelectedIndexChanged({
 # Add Proxy Button
 # ================================
 
-# TODO
 $btnAddProxy.Add_Click({
     # Create a new Form
     $frmAddProxy = New-Object system.Windows.Forms.Form
@@ -443,34 +442,45 @@ $btnAddProxy.Add_Click({
     # Add Click
     $btnProxyAccept.Add_Click({
         $SelectedUser = $lstShowUser.SelectedItem
-        
+        $UserSAMAccount = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object -ExpandProperty SamAccountName
         $ProxyAddress = $txtProxyAddress.Text
 
-        # Verify that it's not Null and Valid
-        if (($ProxyAddress -eq $null) -or ($ProxyAddress -eq "")){
-            Alert "No Proxy Given" "Cannot add empty proxy address"
-        }
-        # Pop-up to assure the this is what the user wants
-        else{
-            # Logic for Acceptance or Otherwise cancellation
+        if (($SelectedUser -eq $null) -or ($SelectedUser -eq "")) {
+            Alert "No User Selected" "Cannot add to empty user"
+            # Verify that it's not Null and Valid
+            if (($ProxyAddress -eq $null) -or ($ProxyAddress -eq "")){
+                Alert "No Proxy Given" "Cannot add empty proxy address"
+            }
+            # Pop-up to assure the this is what the user wants
+            else{
+                # Logic for Acceptance or Otherwise cancellation
+                $Selection = Confirmation "Add New Proxy Address" "You are about to add $ProxyAddress to $SelectedUser. Are you sure?"
 
-            # For Acceptance: 
-            # Pass Data to AD/O365 and add the proxy address
-            # Close pop-up and clear text-box or 
+                # Verify confirmation.
+                if($Selection -eq "Yes"){
+                    Set-ADUser $UserSAMAccount -Add @{ProxyAddresses="$ProxyAddress"}
+                    $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+                    ("$Timestamp - Proxy address $ProxyAddress added to $SelectedUser")| Out-File $AppPath$LogFile -Append
+                }
+                else{
+                    $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+                    ("$Timestamp - Addition to $SelectedUser cancelled")| Out-File $AppPath$LogFile -Append
+                }
 
-            # For Cancellation:
-            # Close Pop-up
-
-            # Close Subform
-            $frmAddProxy.Close()
+                # Close Subform
+                $frmAddProxy.Close()
+                ("-~-") | Out-File $AppPath$LogFile -Append
+            }
         }
     })
 
-    # 
+    # Cancel Button in (Add)
     $btnProxyDecline.Add_Click({
-    
         # Clear and Dispose of Form after accepting Data
         $frmAddProxy.Close()
+        $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+        ("$Timestamp - Addition to $SelectedUser cancelled")| Out-File $AppPath$LogFile -Append
+        ("-~-") | Out-File $AppPath$LogFile -Append
     })
 
     # Show Form
@@ -486,16 +496,39 @@ $btnAddProxy.Add_Click({
 # Delete Proxy Button
 # ================================
 
-# TODO
 $btnDeleteProxy.Add_Click({
-    # Ensure that both user and desired proxy is highlighted
-    # if not throw notice
 
-    # Pop-up to alert {proxy} will be removed from {user}
-    # if yes complete action if no just close and do nothing
+    $SelectedUser = $lstShowUser.SelectedItem
+    $UserSAMAccount = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object -ExpandProperty SamAccountName
+    $ProxyToDelete = $lstShowProxy.SelectedItem
+
+    # Check if user is highlighted 
+    if (($SelectedUser -eq $null) -or ($SelectedUser -eq "")){
+        Alert "No User Selected" "Cannot perform action on empty user"
+    }
+    else {
+        # Check if proxy is highlighted
+        if (($ProxyToDelete -eq $null) -or ($ProxyToDelete -eq "")){
+            Alert "No Proxy Selected" "Cannot delete empty proxy address"
+        }
+        # Perform if both 
+        else {
+            # Logic for Acceptance or Otherwise cancellation
+            $Selection = Confirmation "Remove Proxy Address" "You are about to remove $ProxyAddress from $SelectedUser. Are you sure?"
+
+            if($Selection -eq "Yes"){
+                Set-ADUser $UserSAMAccount -remove @{ProxyAddresses="$ProxyToDelete"}
+                $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+                ("$Timestamp - Removed proxy address $ProxyToDelete from $SelectedUser")| Out-File $AppPath$LogFile -Append
+            }
+            else {
+                $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
+                ("$Timestamp - Proxy Address Removal cancelled on $SelectedUser")| Out-File $AppPath$LogFile -Append
+            }
+        }
+    }
+    ("-~-") | Out-File $AppPath$LogFile -Append
 })
-
-
 
 # Enforces the use of the exit button such that any other method of closing will not work including forced close.
 # ================================
@@ -559,6 +592,13 @@ function Alert([String] $Title, [String] $Message){
     Show-MessageBox -Title "$Title" -Message "$Message" -Icon Information -Buttons OKOnly
 }
 
+# ================================
+# Confirmation Function
+# ================================
+
+function Confirmation([String] $Title, [String] $Message){
+    Show-MessageBox -Title "$Title" -Message "$Message" -Icon Question -Buttons YesNo
+}
 
 # ========================================================
 # Show Screen and Ensure the X button cannot be used.
