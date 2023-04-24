@@ -1,4 +1,4 @@
-# Last Major Addition 4/4/23 - DS
+# Last Major Addition 4/24/23 - DS
 
 Clear-Host
 
@@ -212,7 +212,6 @@ $frmInitialScreen.controls.Add($lstShowProxy)
 # End of Current GUI Stage =======================================
 
 #Connection test
-
 #Initial test to check if the user has access to AD by trying to search the name of the current user.
 
 $ErrorActionPreference = 'continue'
@@ -274,7 +273,7 @@ Try{
 }
 
 
-
+##
 # Search Active Directory for users that match a string to some degree which then pulls the closest match
 # ================================
 # Button for search
@@ -338,6 +337,7 @@ $btnSearchByUsername.Add_Click({
     }
 })
 
+##
 # When a user highlights a user in the results box from user search output is shown in second box
 # ====================================
 # Update Prox List on User Highlight
@@ -374,6 +374,7 @@ $lstShowUser.Add_SelectedIndexChanged({
     ("-~-") | Out-File $AppPath$LogFile -Append
 })
 
+##
 # Creates a pop-up for the input and acceptance of data.
 # ================================
 # Add Proxy Button
@@ -440,13 +441,17 @@ $btnAddProxy.Add_Click({
     # Functionality for the buttons
 
     # Add Click
+    # Current version exclusively uses secondary addresses only as this is meant to only assign smtp addresses for reading mail, not writing.
     $btnProxyAccept.Add_Click({
+
+        BeginningTimestamp("Add Proxy Address.")
+
         $SelectedUser = $lstShowUser.SelectedItem
         $UserSAMAccount = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object -ExpandProperty SamAccountName
         $ProxyAddress = $txtProxyAddress.Text
 
         if (($SelectedUser -eq $null) -or ($SelectedUser -eq "")) {
-            Alert "No User Selected" "Cannot add to empty user"
+                Alert "No User Selected" "Cannot add to empty user"
             # Verify that it's not Null and Valid
             if (($ProxyAddress -eq $null) -or ($ProxyAddress -eq "")){
                 Alert "No Proxy Given" "Cannot add empty proxy address"
@@ -458,7 +463,7 @@ $btnAddProxy.Add_Click({
 
                 # Verify confirmation.
                 if($Selection -eq "Yes"){
-                    Set-ADUser $UserSAMAccount -Add @{ProxyAddresses="$ProxyAddress"}
+                    Set-ADUser $UserSAMAccount -Add @{ProxyAddresses="smtp:$ProxyAddress"}
                     $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
                     ("$Timestamp - Proxy address $ProxyAddress added to $SelectedUser")| Out-File $AppPath$LogFile -Append
                 }
@@ -490,13 +495,14 @@ $btnAddProxy.Add_Click({
     [void]$frmAddProxy.ShowDialog()
 })
 
-
+##
 # Deletes the proxy from the selected users returned proxies.
 # ================================
 # Delete Proxy Button
 # ================================
 
 $btnDeleteProxy.Add_Click({
+    BeginningTimestamp("Delete Proxy Address.")
 
     $SelectedUser = $lstShowUser.SelectedItem
     $UserSAMAccount = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object -ExpandProperty SamAccountName
@@ -530,6 +536,7 @@ $btnDeleteProxy.Add_Click({
     ("-~-") | Out-File $AppPath$LogFile -Append
 })
 
+##
 # Enforces the use of the exit button such that any other method of closing will not work including forced close.
 # ================================
 # Exit Button Function
@@ -545,6 +552,7 @@ $btnExit.Add_Click({
     $frmInitialScreen.Close()
 })
 
+##
 # Basic Timestamp Function for the tracking of method using 
 # ================================
 # Timestamp Function
@@ -557,7 +565,7 @@ Function BeginningTimestamp([String] $functionLabel){
     ("$Timestamp - FUNCTION - $functionLabel") | Out-File $AppPath$LogFile -Append
 }
 
-
+##
 # Alert Box for Users
 # Overloaded Method to Ensure this cannot be pushed behind initial application and ignored
 # ================================
@@ -583,6 +591,7 @@ function Show-MessageBox {
     [Microsoft.VisualBasic.Interaction]::MsgBox($Message, "$Buttons,SystemModal,$Icon", $Title)
 }
 
+##
 # Shortened Call function for the alert
 # Note: This works as a POWERSHELL Method, not DOTNET therefore do not use parenthesis when using the function
 # ================================

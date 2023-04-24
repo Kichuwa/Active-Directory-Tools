@@ -632,10 +632,6 @@ $btnGetLockoutBlame.Add_Click({
         $DomainController = Get-ADDomainController -Discover -Service PrimaryDC
         $ComputerName = $DomainController.HostName
 
-        # ======================================
-        # Not in Use Yet =======================
-        #$DC = $ComputerName.ToString()
-
         Try{
             if($lstShowFirstGroups.SelectedItem -eq $null){
                 ClearVerboseOutput
@@ -824,11 +820,6 @@ $btnShowFirstUsers.Add_click({
  
                 $Username = $UserProfile.name
                 
-                #=============================================
-                # Not in Use yet =============================
-                # $ObjectClass = $UserProfile.objectclass
-                # $DisplayName = $UserProfile.displayname
-                
                 foreach($User in $UserProfile){
 
                     if($Username -notmatch "tmpl"){
@@ -985,7 +976,6 @@ $btnCopyUsersOver.Add_Click({
 # ===============================================================
 # Show members of group 
 # Note: Will thorw error if selecting a non-OU very error prone
-# TODO: Fix issue pulling user memberships
 # ===============================================================
 
 $btnShowMemberships.Add_Click({
@@ -1012,6 +1002,7 @@ $btnShowMemberships.Add_Click({
         }
         Try{
 
+            # Search for user's AD information to pull memberships.
             $UserProfile = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object name, samaccountname, userprincipalname
             $UserProfileSAM = $UserProfile.SamAccountName
             $Memberships = Get-ADPrincipalGroupMembership -Identity $UserProfileSAM | Select-Object name | Sort-Object
@@ -1024,8 +1015,6 @@ $btnShowMemberships.Add_Click({
 
             }
         }Catch{
-            # TODO: ClearVerboseOutput causes errors while fetching memberships due to output of group being put in second group list. 
-            # ClearVerboseOutput
             $VerboseMessage = ("Could not display memberships. Ensure you have selected a user and not a group.")
             $lstVerboseOutput.Items.Add($VerboseMessage)
 
@@ -1059,14 +1048,15 @@ $btnUserInfo.Add_Click({
             $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
             ("$Timestamp - Results for - $SelectedUser")| Out-File $AppPath$LogFile -Append
 
+            # Get PC Information
             $ComputerProperties = Get-ADComputer -Filter "Description -like '*$SelectedUser*'" -Properties *
             $CompProperties = ("DNSHostName", "Description", "IPv4Address")
-
+            # Get User Information
             $AllProperties = Get-ADUser -Filter "Name -eq '$SelectedUser'" -Properties *
             $Properties = ("DisplayName", "SamAccountName", "Title", "Department", "Description", "LockedOut", "logonCount", "LastLogonDate", "OfficePhone", "whenCreated", "whenChanged")
 
+            # Iterate to build readable list from property array
             Foreach ($Property in $CompProperties){
-
                 Try{
 
                     $PropertyValue = $ComputerProperties.$Property
@@ -1080,7 +1070,8 @@ $btnUserInfo.Add_Click({
                     $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
                     ("$Timestamp - $Property - $PropertyValue")| Out-File $AppPath$LogFile -Append
                 
-                }Catch{
+                }
+                Catch{
 
                     $VerboseInfo = ("Couldn't obtain $Property for $SelectedUser")
 
@@ -1179,8 +1170,8 @@ $btnCopySelectedUsers.Add_Click({
         $lstVerboseOutput.Items.Add($VerboseMessage)
     }
     else{
+        # Filters for users to get SAM Account for modification
         Try{
-
             $SelectedUser = $SelectedUsers[0]
             $UserProfile = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object name, samaccountname
             $username = $UserProfile.samaccountname
@@ -1199,7 +1190,7 @@ $btnCopySelectedUsers.Add_Click({
                     $LifeName = $UserProfile.name
 
                     Try{
-
+                        # Exclude Templates then copy over
                         if($Lifename -notmatch "tmp"){
                             if($Lifename -notmatch "tmpl"){
 
@@ -1208,12 +1199,13 @@ $btnCopySelectedUsers.Add_Click({
                                 $Count += 1
                             }
                         }
-                    }Catch{                
+                    }
+                    Catch{                
                         $VerboseMessage = ("Could not copy $SelectedUser to $SecondSelectedGroup")
                         $lstVerboseOutput.Items.Add($VerboseMessage)
                     }
                 }
-                #Ask the user to confirm before copying any users
+                # Ask the user to confirm before copying any users
                 if([System.Windows.Forms.MessageBox]::Show("Copy $Count users?", "Confirm",[System.Windows.Forms.MessageBoxButtons]::OKCancel) -eq "OK"){
 
                     ClearVerboseOutput
@@ -1226,6 +1218,7 @@ $btnCopySelectedUsers.Add_Click({
                         $LifeName = $UserProfile.name
 
                         Try{
+                            # Exclude Templates then copy
                             if($Lifename -notmatch "tmp"){
                                 if($Lifename -notmatch "tmpl"){
 
