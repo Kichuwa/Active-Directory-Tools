@@ -139,6 +139,7 @@ $btnAddProxy.location = New-Object system.drawing.size(5,105)
 $btnAddProxy.Font = "Microsoft Sans Serif,10"
 $btnAddProxy.TabStop = $false
 $btnAddProxy.Anchor = "Left, Top"
+$btnAddProxy.Enabled = $false
 $frmInitialScreen.controls.Add($btnAddProxy)
 
 $btnDeleteProxy = New-Object system.windows.Forms.Button
@@ -149,6 +150,7 @@ $btnDeleteProxy.location = New-Object system.drawing.size(5,150)
 $btnDeleteProxy.Font = "Microsoft Sans Serif,10"
 $btnDeleteProxy.TabStop = $false
 $btnDeleteProxy.Anchor = "Left, Top"
+$btnDeleteProxy.Enabled = $false
 $frmInitialScreen.controls.Add($btnDeleteProxy)
 
 # Exit Button
@@ -347,6 +349,10 @@ $lstShowUser.Add_SelectedIndexChanged({
 
     $SelectedUser = $lstShowUser.SelectedItem
 
+    # Set buttons to active
+    $btnAddProxy.Enabled = $true
+    $btnDeleteProxy.Enabled = $true
+
     BeginningTimestamp("Selected user $SelectedUser")
 
     # Selects all proxy Adderesses that match a SMTP or smtp object.
@@ -451,13 +457,14 @@ $btnAddProxy.Add_Click({
         $ProxyAddress = $txtProxyAddress.Text
 
         if (($SelectedUser -eq $null) -or ($SelectedUser -eq "")) {
-                Alert "No User Selected" "Cannot add to empty user"
+            Alert "No User Selected" "Cannot add to empty user"
             # Verify that it's not Null and Valid
-            if (($ProxyAddress -eq $null) -or ($ProxyAddress -eq "")){
-                Alert "No Proxy Given" "Cannot add empty proxy address"
-            }
-            # Pop-up to assure the this is what the user wants
-            else{
+        }
+        elseif (($ProxyAddress -eq $null) -or ($ProxyAddress -eq "")){
+            Alert "No Proxy Given" "Cannot add empty proxy address"
+        }
+        # Pop-up to assure the this is what the user wants
+        else{
                 # Logic for Acceptance or Otherwise cancellation
                 $Selection = Confirmation "Add New Proxy Address" "You are about to add $ProxyAddress to $SelectedUser. Are you sure?"
 
@@ -476,7 +483,7 @@ $btnAddProxy.Add_Click({
                 $frmAddProxy.Close()
                 ("-~-") | Out-File $AppPath$LogFile -Append
             }
-        }
+        
     })
 
     # Cancel Button in (Add)
