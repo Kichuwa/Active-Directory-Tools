@@ -378,11 +378,6 @@ $frmInitialScreen.controls.Add($lstVerboseOutput)
 $ErrorActionPreference = 'continue'
 $CurrentUser = [Environment]::UserName
 
-# =========================================================
-# Not In Use Yet ==========================================
-# $CurrentMachine = [Environment]::MachineName
-# $CurrentTime = Get-Date -Format g
-
 $RootCheck = Test-Path $RootPath
 $AppCheck = Test-Path $AppPath
 
