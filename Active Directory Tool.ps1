@@ -1,4 +1,4 @@
-﻿# Last Major Addition 4/3/23 - DS
+﻿# Last Major Addition 4/25/23 - DS
 Clear-Host
 
 Import-Module ActiveDirectory | Out-Null
@@ -138,6 +138,8 @@ $lblFootnote.Font = "Microsoft Sans Serif,8"
 $lblFootnote.Anchor = "Left, Bottom"
 $frmInitialScreen.controls.Add($lblFootnote)
 
+# Search Text Box
+
 $txtGetFirstGroupInfo = New-Object system.windows.Forms.TextBox
 $txtGetFirstGroupInfo.Width = 178
 $txtGetFirstGroupInfo.Height = 20
@@ -145,62 +147,15 @@ $txtGetFirstGroupInfo.location = New-Object system.drawing.size(5,40)
 $txtGetFirstGroupInfo.Font = "Microsoft Sans Serif,10"
 $txtGetFirstGroupInfo.TabIndex = 0
 $frmInitialScreen.controls.Add($txtGetFirstGroupInfo)
-$txtGetFirstGroupInfo_KeyDown = {}
-$txtGetFirstGroupInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{}
-$txtGetFirstGroupInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{
-    if ($_.KeyCode -eq 'Enter')
-    {
-        $btnShowFirstGroups.PerformClick()
-    }
-}
 $txtGetFirstGroupInfo.Anchor = "Left, Top"
-$txtGetFirstGroupInfo.Add_KeyDown($txtGetFirstGroupInfo_KeyDown)
 
-
-$txtGetSecondGroupInfo = New-Object system.windows.Forms.TextBox
-$txtGetSecondGroupInfo.Width = 178
-$txtGetSecondGroupInfo.Height = 20
-$txtGetSecondGroupInfo.location = New-Object system.drawing.size(5,105)
-$txtGetSecondGroupInfo.Font = "Microsoft Sans Serif,10"
-$txtGetSecondGroupInfo.TabIndex = 1
-$frmInitialScreen.controls.Add($txtGetSecondGroupInfo)
-$txtGetSecondGroupInfo_KeyDown = {}
-$txtGetSecondGroupInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{}
-$txtGetSecondGroupInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{
-    if ($_.KeyCode -eq 'Enter')
-    {
-        $btnShowSecondGroups.PerformClick()
-    }
-}
-$txtGetSecondGroupInfo.Anchor = "Left, Top"
-$txtGetSecondGroupInfo.Add_KeyDown($txtGetSecondGroupInfo_KeyDown)
-
-$txtGetUsernameInfo = New-Object system.windows.Forms.TextBox
-$txtGetUsernameInfo.Width = 178
-$txtGetUsernameInfo.Height = 20
-$txtGetUsernameInfo.location = New-Object system.drawing.size(5,175)
-$txtGetUsernameInfo.Font = "Microsoft Sans Serif,10"
-$txtGetUsernameInfo.TabIndex = 2
-$txtGetUsernameInfo.KeyUp
-$frmInitialScreen.controls.Add($txtGetUsernameInfo)
-$txtGetUsernameInfo_KeyDown = {}
-$txtGetUsernameInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{}
-$txtGetUsernameInfo_KeyDown = [System.Windows.Forms.KeyEventHandler]{
-    if ($_.KeyCode -eq 'Enter')
-    {
-        $btnSearchByUsername.PerformClick()
-    }
-}
-$txtGetUsernameInfo.Anchor = "Left, Top"
-$txtGetUsernameInfo.Add_KeyDown($txtGetUsernameInfo_KeyDown)
-
-#Buttons below are vertical
+# Buttons below are vertical (Searches and Clear)
 
 $btnShowFirstGroups = New-Object system.windows.Forms.Button
 $btnShowFirstGroups.Text = 'Search Source Group'
 $btnShowFirstGroups.Width = 180
-$btnShowFirstGroups.Height = 30
-$btnShowFirstGroups.location = New-Object system.drawing.size(4,65)
+$btnShowFirstGroups.Height = 45
+$btnShowFirstGroups.location = New-Object system.drawing.size(4,70)
 $btnShowFirstGroups.Font = "Microsoft Sans Serif,10"
 $btnShowFirstGroups.TabStop = $false
 $btnShowFirstGroups.Anchor = "Left, Top"
@@ -209,8 +164,8 @@ $frmInitialScreen.controls.Add($btnShowFirstGroups)
 $btnShowSecondGroups = New-Object system.windows.Forms.Button
 $btnShowSecondGroups.Text = 'Search Destination Group'
 $btnShowSecondGroups.Width = 180
-$btnShowSecondGroups.Height = 30
-$btnShowSecondGroups.location = New-Object system.drawing.size(4,130)
+$btnShowSecondGroups.Height = 45
+$btnShowSecondGroups.location = New-Object system.drawing.size(4,120)
 $btnShowSecondGroups.Font = "Microsoft Sans Serif,10"
 $btnShowSecondGroups.TabStop = $false
 $btnShowSecondGroups.Anchor = "Left, Top"
@@ -219,8 +174,8 @@ $frmInitialScreen.controls.Add($btnShowSecondGroups)
 $btnSearchByUsername = New-Object system.windows.Forms.Button
 $btnSearchByUsername.Text = 'Search By Name'
 $btnSearchByUsername.Width = 180
-$btnSearchByUsername.Height = 30
-$btnSearchByUsername.location = New-Object system.drawing.size(4,200)
+$btnSearchByUsername.Height = 45
+$btnSearchByUsername.location = New-Object system.drawing.size(4,170)
 $btnSearchByUsername.Font = "Microsoft Sans Serif,10"
 $btnSearchByUsername.TabStop = $false
 $btnSearchByUsername.Anchor = "Left, Top"
@@ -229,8 +184,8 @@ $frmInitialScreen.controls.Add($btnSearchByUsername)
 $btnClearListBoxes = New-Object system.windows.Forms.Button
 $btnClearListBoxes.Text = 'Clear'
 $btnClearListBoxes.Width = 180
-$btnClearListBoxes.Height = 30
-$btnClearListBoxes.location = New-Object system.drawing.size(4,235)
+$btnClearListBoxes.Height = 45
+$btnClearListBoxes.location = New-Object system.drawing.size(4,220)
 $btnClearListBoxes.Font = "Microsoft Sans Serif,10"
 $btnClearListBoxes.TabIndex = 3
 $btnClearListBoxes.Anchor = "Left, Top"
@@ -256,8 +211,6 @@ $btnShowHelp.location = New-Object system.drawing.size(4,310)
 $btnShowHelp.Font = "Microsoft Sans Serif,10"
 $btnShowHelp.TabIndex = 13
 $frmInitialScreen.controls.Add($btnShowHelp)
-
-
 
 
 $btnShowFirstUsers = New-Object system.windows.Forms.Button
@@ -323,9 +276,9 @@ $frmInitialScreen.controls.Add($btnUnlockAccount)
 
 $btnExit = New-Object system.windows.Forms.Button
 $btnExit.Text = 'Exit'
-$btnExit.Width = 150
+$btnExit.Width = 75
 $btnExit.Height = 40
-$btnExit.location = New-Object system.drawing.size(470,610)
+$btnExit.location = New-Object system.drawing.size(545,610)
 $btnExit.Font = "Microsoft Sans Serif,10"
 $btnExit.TabIndex = 14
 $btnExit.Anchor = "Bottom, Right"
@@ -501,7 +454,7 @@ $btnShowSecondGroups.Add_Click({
 
     BeginningTimestamp("Search Second Group.")
 
-    if($txtGetSecondGroupInfo.Text -eq ""){
+    if($txtGetFirstGroupInfo.Text -eq ""){
 
         ClearVerboseOutput
         $VerboseMessage = ("You can't leave the detination box blank.")
@@ -519,7 +472,7 @@ $btnShowSecondGroups.Add_Click({
         }
         Try{
 
-            $GroupnameSearch2 = $txtGetSecondGroupInfo.Text
+            $GroupnameSearch2 = $txtGetFirstGroupInfo.Text
             $GroupList2 = Get-ADGroup -Filter "name -like '*$GroupnameSearch2*'" | Select-Object SamAccountName
 
             ForEach($Group2 in $GroupList2){
@@ -551,7 +504,7 @@ $btnSearchByUsername.Add_Click({
     BeginningTimestamp("Search by Username.")
 
     $lstShowFirstGroups.SelectionMode = "MultiExtended"
-    if($txtGetUsernameInfo.Text -eq ""){
+    if($txtGetFirstGroupInfo.Text -eq ""){
 
         ClearVerboseOutput
         $VerboseMessage = ("You can't leave the username box blank.")
@@ -569,7 +522,7 @@ $btnSearchByUsername.Add_Click({
         }
         # Eventually implement a better regex for search results
         Try{
-            $UsernameSearch = $txtGetUsernameInfo.Text
+            $UsernameSearch = $txtGetFirstGroupInfo.Text
             $UsernameSearch = $UsernameSearch -replace ".{0}$"
             $UserProfiles = Get-ADUser -Filter "Name -like '*$UsernameSearch*'" | Select-Object name, samaccountname
             
@@ -611,8 +564,8 @@ $btnClearListBoxes.Add_Click({
     }
 
     $txtGetFirstGroupInfo.Text = ""
-    $txtGetSecondGroupInfo.Text = ""
-    $txtGetUsernameInfo.Text = ""
+    $txtGetFirstGroupInfo.Text = ""
+    $txtGetFirstGroupInfo.Text = ""
 })
 
 
@@ -631,6 +584,10 @@ $btnGetLockoutBlame.Add_Click({
     Try{
         $DomainController = Get-ADDomainController -Discover -Service PrimaryDC
         $ComputerName = $DomainController.HostName
+
+        # ======================================
+        # Not in Use Yet =======================
+        #$DC = $ComputerName.ToString()
 
         Try{
             if($lstShowFirstGroups.SelectedItem -eq $null){
@@ -820,6 +777,11 @@ $btnShowFirstUsers.Add_click({
  
                 $Username = $UserProfile.name
                 
+                #=============================================
+                # Not in Use yet =============================
+                # $ObjectClass = $UserProfile.objectclass
+                # $DisplayName = $UserProfile.displayname
+                
                 foreach($User in $UserProfile){
 
                     if($Username -notmatch "tmpl"){
@@ -975,7 +937,7 @@ $btnCopyUsersOver.Add_Click({
 
 # ===============================================================
 # Show members of group 
-# Note: Will thorw error if selecting a non-OU very error prone
+# Note: Will throw error if selecting a non-OU very error prone
 # ===============================================================
 
 $btnShowMemberships.Add_Click({
@@ -1002,7 +964,6 @@ $btnShowMemberships.Add_Click({
         }
         Try{
 
-            # Search for user's AD information to pull memberships.
             $UserProfile = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object name, samaccountname, userprincipalname
             $UserProfileSAM = $UserProfile.SamAccountName
             $Memberships = Get-ADPrincipalGroupMembership -Identity $UserProfileSAM | Select-Object name | Sort-Object
@@ -1014,7 +975,8 @@ $btnShowMemberships.Add_Click({
                 ("$Timestamp - < $UserProfileSAM > belongs to - $Group.")| Out-File $AppPath$LogFile -Append
 
             }
-        }Catch{
+        }Catch{ 
+            # ClearVerboseOutput
             $VerboseMessage = ("Could not display memberships. Ensure you have selected a user and not a group.")
             $lstVerboseOutput.Items.Add($VerboseMessage)
 
@@ -1035,6 +997,20 @@ $btnUserInfo.Add_Click({
     BeginningTimestamp("Get details about selected user.")
     
     $SelectedUser = $lstShowFirstGroups.SelectedItem
+    $UserSAMAccount = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object -ExpandProperty SamAccountName
+    
+    # Get Path to User
+    $DN = (Get-ADUser -Identity $UserSAMAccount -Properties DistinguishedName).DistinguishedName
+    # $OUPath splits DN into 2 parts, grabs second part and replaces OU, DC, and CN references to mimic a folder structure
+    $OUPath = (($DN -split ',', 2)[1] -replace '^OU=','') -replace ',OU=', '\'
+    $OUPath = $OUPath -replace ',DC=[^,]+', '' -replace '^CN=', ''
+    # $UserName Splits indefinitely, grabs first instance and replaces references to "CN=""
+    $UserName = ($DN -split ',')[0] -replace '^CN=',''
+     # Reassemble the DC units as the FQDN for human readability
+    $DN = $DN -replace '^.*?,DC=',''
+    $DN = $DN -replace ',DC=', '.'
+    $DN = "\\$DN\$OUPath\$UserName"
+    
 
     if($SelectedUser -eq $null){
 
@@ -1048,15 +1024,16 @@ $btnUserInfo.Add_Click({
             $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
             ("$Timestamp - Results for - $SelectedUser")| Out-File $AppPath$LogFile -Append
 
-            # Get PC Information
             $ComputerProperties = Get-ADComputer -Filter "Description -like '*$SelectedUser*'" -Properties *
             $CompProperties = ("DNSHostName", "Description", "IPv4Address")
-            # Get User Information
+
             $AllProperties = Get-ADUser -Filter "Name -eq '$SelectedUser'" -Properties *
             $Properties = ("DisplayName", "SamAccountName", "Title", "Department", "Description", "LockedOut", "logonCount", "LastLogonDate", "OfficePhone", "whenCreated", "whenChanged")
 
-            # Iterate to build readable list from property array
+
+
             Foreach ($Property in $CompProperties){
+
                 Try{
 
                     $PropertyValue = $ComputerProperties.$Property
@@ -1070,8 +1047,7 @@ $btnUserInfo.Add_Click({
                     $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
                     ("$Timestamp - $Property - $PropertyValue")| Out-File $AppPath$LogFile -Append
                 
-                }
-                Catch{
+                }Catch{
 
                     $VerboseInfo = ("Couldn't obtain $Property for $SelectedUser")
 
@@ -1081,6 +1057,11 @@ $btnUserInfo.Add_Click({
                     ("$Timestamp - Couldn't obtain < $Property > for - $SelectedUser")| Out-File $AppPath$LogFile -Append
                 }
             }
+
+            # Path to User, heavily customized and cannot be moved to enhanced for loop
+            $lstVerboseOutput.Items.Add("Active Directory Path: $DN")
+            $lstVerboseOutput.Items.Add("")
+
             Foreach ($Property in $Properties){
 
                 $PropertyValue = $AllProperties.$Property
@@ -1126,19 +1107,26 @@ $btnShowHelp.Add_Click({
     $lstVerboseOutput.Items.Add($BlankLine)
     $lstVerboseOutput.Items.Add("Search for the source and destination groups using the search boxes.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add("After highlighting a group from each box, select 'Copy All Users' to copy all the users from the left to the right group.")
+    $lstVerboseOutput.Items.Add("After highlighting a group from each box, select 'Copy All Users' ")
+    $lstVerboseOutput.Items.Add("to copy all the users from the left to the right group.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add("You can also search for users by username or name which will be displayed in the first box.")
+    $lstVerboseOutput.Items.Add("You can also search for users by username or name which will be ")
+    $lstVerboseOutput.Items.Add("displayed in the first box.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add("Highlight users from the first box and choose 'Copy Selected Users' to copy only these users to the destination group.")
+    $lstVerboseOutput.Items.Add("Highlight users from the first box and choose 'Copy Selected Users'")
+    $lstVerboseOutput.Items.Add("to copy only these users to the destination group.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add("Highlight a user and select 'Show Users Groups' to fill the second box with all the groups that the user belongs to.")
+    $lstVerboseOutput.Items.Add("Highlight a user and select 'Show Users Groups' to fill the ")
+    $lstVerboseOutput.Items.Add("second box with all the groups that the user belongs to.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add("Highlight a user and select 'Lockout Location' to find the machine that locked out their account.")
+    $lstVerboseOutput.Items.Add("Highlight a user and select 'Lockout Location' to ")
+    $lstVerboseOutput.Items.Add("find the machine that locked out their account.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add("Highlight a group in the source box and select 'Show Group Members' to display the users that are part of that group.")
+    $lstVerboseOutput.Items.Add("Highlight a group in the source box and select 'Show Group Members'")
+    $lstVerboseOutput.Items.Add("to display the users that are part of that group.")
     $lstVerboseOutput.Items.Add($BlankLine)
-    $lstVerboseOutput.Items.Add("Highlight a user and select 'Get User Info' to see their machine name, AD info, IP Address etc.")
+    $lstVerboseOutput.Items.Add("Highlight a user and select 'Get User Info' to see")
+    $lstVerboseOutput.Items.Add("their machine name, AD info, IP Address etc.")
 
 })
 
@@ -1170,8 +1158,8 @@ $btnCopySelectedUsers.Add_Click({
         $lstVerboseOutput.Items.Add($VerboseMessage)
     }
     else{
-        # Filters for users to get SAM Account for modification
         Try{
+
             $SelectedUser = $SelectedUsers[0]
             $UserProfile = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object name, samaccountname
             $username = $UserProfile.samaccountname
@@ -1190,7 +1178,7 @@ $btnCopySelectedUsers.Add_Click({
                     $LifeName = $UserProfile.name
 
                     Try{
-                        # Exclude Templates then copy over
+
                         if($Lifename -notmatch "tmp"){
                             if($Lifename -notmatch "tmpl"){
 
@@ -1199,13 +1187,12 @@ $btnCopySelectedUsers.Add_Click({
                                 $Count += 1
                             }
                         }
-                    }
-                    Catch{                
+                    }Catch{                
                         $VerboseMessage = ("Could not copy $SelectedUser to $SecondSelectedGroup")
                         $lstVerboseOutput.Items.Add($VerboseMessage)
                     }
                 }
-                # Ask the user to confirm before copying any users
+                #Ask the user to confirm before copying any users
                 if([System.Windows.Forms.MessageBox]::Show("Copy $Count users?", "Confirm",[System.Windows.Forms.MessageBoxButtons]::OKCancel) -eq "OK"){
 
                     ClearVerboseOutput
@@ -1218,7 +1205,6 @@ $btnCopySelectedUsers.Add_Click({
                         $LifeName = $UserProfile.name
 
                         Try{
-                            # Exclude Templates then copy
                             if($Lifename -notmatch "tmp"){
                                 if($Lifename -notmatch "tmpl"){
 
