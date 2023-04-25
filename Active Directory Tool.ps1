@@ -213,8 +213,6 @@ $btnShowHelp.TabIndex = 13
 $frmInitialScreen.controls.Add($btnShowHelp)
 
 
-
-
 $btnShowFirstUsers = New-Object system.windows.Forms.Button
 $btnShowFirstUsers.Text = 'Show Group Members'
 $btnShowFirstUsers.Width = 150
@@ -999,6 +997,20 @@ $btnUserInfo.Add_Click({
     BeginningTimestamp("Get details about selected user.")
     
     $SelectedUser = $lstShowFirstGroups.SelectedItem
+    $UserSAMAccount = Get-ADUser -Filter "Name -eq '$SelectedUser'" | Select-Object -ExpandProperty SamAccountName
+    
+    # Get Path to User
+    $DN = (Get-ADUser -Identity $UserSAMAccount -Properties DistinguishedName).DistinguishedName
+    # $OUPath splits DN into 2 parts, grabs second part and replaces OU, DC, and CN references to mimic a folder structure
+    $OUPath = (($DN -split ',', 2)[1] -replace '^OU=','') -replace ',OU=', '\'
+    $OUPath = $OUPath -replace ',DC=[^,]+', '' -replace '^CN=', ''
+    # $UserName Splits indefinitely, grabs first instance and replaces references to "CN=""
+    $UserName = ($DN -split ',')[0] -replace '^CN=',''
+     # Reassemble the DC units as the FQDN for human readability
+    $DN = $DN -replace '^.*?,DC=',''
+    $DN = $DN -replace ',DC=', '.'
+    $DN = "\\$DN\$OUPath\$UserName"
+    
 
     if($SelectedUser -eq $null){
 
@@ -1017,6 +1029,8 @@ $btnUserInfo.Add_Click({
 
             $AllProperties = Get-ADUser -Filter "Name -eq '$SelectedUser'" -Properties *
             $Properties = ("DisplayName", "SamAccountName", "Title", "Department", "Description", "LockedOut", "logonCount", "LastLogonDate", "OfficePhone", "whenCreated", "whenChanged")
+
+
 
             Foreach ($Property in $CompProperties){
 
@@ -1043,6 +1057,11 @@ $btnUserInfo.Add_Click({
                     ("$Timestamp - Couldn't obtain < $Property > for - $SelectedUser")| Out-File $AppPath$LogFile -Append
                 }
             }
+
+            # Path to User, heavily customized and cannot be moved to enhanced for loop
+            $lstVerboseOutput.Items.Add("Path: $DN")
+            $lstVerboseOutput.Items.Add("")
+
             Foreach ($Property in $Properties){
 
                 $PropertyValue = $AllProperties.$Property
