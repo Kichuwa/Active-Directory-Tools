@@ -61,7 +61,7 @@ $Date = [DateTime]::Now.ToString($dateFormat)
 $TimestampFormat = "HH:mm:ss"
 $Timestamp = [DateTime]::Now.ToString($TimestampFormat)
 
-$LogDateFormat = "dd-MM-yyyy"
+$LogDateFormat = "MM-dd-yyyy"
 $LogDate = [DateTime]::Today.ToString($LogDateFormat)
 
 $RootPath = "C:\Temp\"
